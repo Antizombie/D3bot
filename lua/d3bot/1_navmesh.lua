@@ -52,19 +52,24 @@ return function(lib)
 			Jump = { "Disabled", "Always" },
 			JumpTo = { "Disabled", "Always", "Close" },
 			Duck = { "Disabled", "Always" },
-			DuckTo = { "Disabled", "Always" },
+			DuckTo = { "Disabled", "Always", "Close" },
 			Wall = { "Suicide", "Retarget" },
 			See = { "Disabled" },
 			Aim = { "Straight" },
 			AimTo = { "Straight" },
 			Cost = {},
-			Condition = { "Unblocked", "Blocked" },
+			Condition = { "Unblocked", "Blocked", "MapUnblocked" },
 			BlockBeforeWave = {},
 			BlockAfterWave = {},
 			Direction = { "Forward", "Backward" },
 			Walking = { "Needed" },
 			Pouncing = { "Needed" },
+			CrabPouncing = { "Needed" },
 			Climbing = { "Needed" },
+			Jumping = { "Needed" },
+			Path = { "Ladder" },
+			Ladder = { "NoDismount" },
+			MaxHeight = {},
 			DMGPerSecond = {},
 			BotMod = {}
 		},
@@ -163,6 +168,7 @@ return function(lib)
 	function fallback:InvalidateCache()
 		for id, link in pairs(lib.MapNavMesh.LinkById) do
 			link.CachedDist = nil -- Used to speed up path finding.
+			link.CachedZDiff = nil
 		end
 	end
 
@@ -259,6 +265,11 @@ return function(lib)
 
 	function linkFallback:GetParam(name) return self.Params[name] or self.Nodes[1].Params[name] or self.Nodes[2].Params[name] end
 
+	---Returns whether pos is inside the area of the given node.
+	---If the node doesn't have any area, it will behave like a circle/sphere with a radius of `BotNodeMinProximity`.
+	---@param pos GVector
+	---@param verticalLimit number? When set we will check against a volume instead, which is defined by the area extruded ±verticalLimit along the z-axis from the node's origin. When set to nil, this function will perform a "2D only" check.
+	---@return boolean
 	function nodeFallback:GetContains(pos, verticalLimit)
 		local z = verticalLimit and math.Clamp(self.Pos.z, pos.z - verticalLimit, pos.z + verticalLimit) or self.Pos.z
 		local pos = Vector(pos.x, pos.y, z)

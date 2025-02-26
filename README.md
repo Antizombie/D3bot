@@ -28,6 +28,11 @@ Here is a list of notable changes compared to the original version:
 - Ability to use source navmeshes, and option to convert those navmeshes into D3bot ones. (Thanks to [Bagellll])
 - Code optimizations. (Thanks to [Antizombie])
 - Support for ZS sub-gamemodes such as Pants Mode, Baby Mode & Classic Mode. (Thanks to [Sigilmare])
+- Parameters for restricting paths based on the bot's jump and crouching height. (Thanks to [bol])
+- Pouncing/Leaping headcrabs. (Thanks to [bol])
+- Ability to change the editing mode with numeric keys. (Thanks to [delstre])
+- Automatic jumping when using the link parameter `Jumping = Needed`. (Thanks to [bol])
+- Better handling of ladders, especially `func_useableladder`. (Thanks to [bol])
 - Translations:
   - Chinese Simplified (Thanks to [XY]EvansFix)
   - Chinese Traditional (Thanks to [Half1569])
@@ -43,7 +48,7 @@ Here is a list of notable changes compared to the original version:
   - Portuguese(Brazil) (Thanks to GMBR | $herlock Bu$ter)
   - Russian (Thanks to [Blueberryy])
   - Spanish (Thanks to [Fafy2801])
-  - Turkish (Thanks to ᴇXғɪʀᴇᴄʜʀᴏᴍᴇ~)
+  - Turkish (Thanks to ᴇXғɪʀᴇᴄʜʀᴏᴍᴇ~ and [NovaDiablox])
   - Ukrainian (Thanks to [ErickMaksimets])
 - Some smaller things I possibly forgot.
 
@@ -120,7 +125,7 @@ Be sure to follow all the other necessary steps as described in [#Installation](
 
 ## How to create navmeshes
 
-- Use the chat command `!bot editmesh ^` to enter the mesh editor.
+- Use the chat command `!bot editmesh ^` or `!bot editmeshspec ^` to enter the mesh editor.
   - Use IN_RELOAD to cycle through the edit modes:
     - Create node: Place nodes with IN_ATTACK.
     - Link nodes: Link nodes by selecting the first then the second node, both with IN_ATTACK. Clear selection with IN_RELOAD.
@@ -146,24 +151,31 @@ Be sure to follow all the other necessary steps as described in [#Installation](
     - Duck = Always: Bots will always crouch if located in this node.
     - DuckTo = Disabled: Bots won't crouch if heading towards this node.
     - DuckTo = Always: Bots will always crouch if heading towards this node.
-    - Climbing = Needed: Only bots with the ability to climb will path through this node. If the node is above the bot, the will look towards this node, jump, and climb towards the node.
+    - DuckTo = Close: Bots will duck if heading towards this node, but only if they are close enough.
+    - Climbing = Needed: Only bots with the ability to climb will path through this node. If the node is above the bot, they will look towards this node, jump, and climb towards the node.
     - Wall = Suicide: Bots suicide if trying to navigate towards this node higher than crouch-jumping height. Use this when respawn is the only way to get to that node.
     - Wall = Retarget: Same as Wall = Suicide but target is changed instead of suiciding. If no other targets are available, target remains the same. Use this for unreachable or low priority nodes.
     - See = Disabled: Bot does not approach target in straight line even if target is visible to him unless he is on the same node as the target. Use this on heightened nodes visible to, but not directly accessible from lower nodes.
     - Aim = Straight: Bot goes straight to the next node. Use this if bots need to get through small holes in the floor or walk on narrow paths without falling down.
     - AimTo = Straight: Bot goes straight to this node. Use this if bots need to get through narrow windows or small holes in the floor.
     - Cost: Add a penalty for paths using this node. Higher values makes it less likely for bots to use a path containing this node.
-    - Condition = Unblocked: Bots will only use this node for pathfinding if there is no entity within a range of one inch. Detected entities are func_breakable, prop_physics, prop_dynamic, prop_door_rotating, func_door, func_physbox_multiplayer, func_movelinear.
-    - Condition = Blocked: Opposite of above. Use this for breakable pathways.
+    - Condition = Unblocked: Bots will only use this node for pathfinding if there is no entity within a range of one source unit. Detected entities are func_breakable, prop_physics, prop_dynamic, prop_door_rotating, func_door, func_physbox_multiplayer, func_movelinear.
+    - Condition = Blocked: Opposite of Unblocked. Use this on breakable pathways.
+    - Condition = MapUnblocked: Same as Unblocked, but it excludes objects that could potentially be used in cades.
     - BlockBeforeWave: Bots will not use this node for pathfinding until the current wave is greater than or equal to the given value.
     - BlockAfterWave: Bots will not use this node for pathfinding if the current wave is greater than the given value.
     - DMGPerSecond: Apply damage to human players and entities located on this node. Can be disabled globally in `sv_config.lua` by setting `D3bot.DisableNodeDamage = true`.
     - BotMod: Once a non bot player passes this node, the given offset will be applied to the zombie count target. Useful to adjust the bot count on objective maps.
+    - MaxHeight: Prevents bots with a crouching/ducking height larger than the provided value from passing through this node. Bots that are taller when standing will crouch automatically when they pass this node.
+    - Ladder = NoDismount: Used in combination with `Path = Ladder` on links. This will prevent bots from pressing e (and/or jumping) when they need to leave a ladder.
   - Link parameters:
     - Cost: Add a penalty for paths using this link. Higher values makes it less likely for bots to use a path containing this link.
     - Direction = Forward: Only allow paths from the first to the second element of the link. `!bot setparam 1-2 Direction Forward` will only allow the bot to move from 1 to 2.
     - Direction = Backward: Same as above, but backwards.
-    - Pouncing = Needed: Only classes with the ability to pounce/leap can use this link.
+    - Pouncing = Needed: Only classes with the ability to pounce/leap can use this link. This parameter will make the bot pounce towards the target node once it reaches the first node.
+    - CrabPouncing = Needed: Only (headcrab like) classes with the ability to pounce/leap can use this link. This parameter will make the bot pounce towards the target node once it reaches the first node.
+    - Jumping = Needed: Only bots that can jump high enough can pass this link. The needed jump height is automatically determined from the height difference of the two nodes. This parameter will make bots jump just before they reach the perimeter of the target node, but only if the target node is above the first node.
+    - Path = Ladder: Marks this link as part of a ladder. The bot will press e (and jump) when he needs to leave a ladder. Useful on links for `func_useableladder` brushes.
 - Use `!bot reloadmesh` to discard changes.
 - Use `!bot savemesh` to save the changes to `garrysmod/data/d3bot/navmesh/map/<mapname>.txt`.
 - Use `!bot setmapparam <name> <value>` (example: `!bot setmapparam botmod 5`) to set or unset (by omitting \<value\>) map specific parameters:
@@ -202,23 +214,24 @@ Starting with highest public priority:
 
 - Making a config.txt for the static variables.
 - Refactoring, e.g. stable API, stable navmesh standard, consistency, bot metatable, gamemode independence by adding hooks usable by gamemodes or gamemode-based plugins, ...
-- Detailed linking e.g. required jump height, movement behavior (gap-jumping, ...), more link unlock conditions, ...
+- Detailed linking e.g. ~~required jump height~~, movement behavior (gap-jumping, ...), more link unlock conditions, ...
 - Map information in navmeshes using a singleton item type solely for storing parameters (e.g. zombie count multiplier).
-- Leap behavior for headcrab bots.
 - Sloped nodes for more accurate locating of entities.
 - Triangle-based nodes using vertices with automatic adjacent linking.
 - Sub-paths in nodes for more accurate movement (no "wall-sliding").
 - Equipment upgrading behavior for survivor bots.
 - Caching of non-branching paths as a single node to optimize the pathfinding performance.
 
-[Sigilmare]: https://github.com/Sigilmare
 [Antizombie]: https://github.com/Antizombie
 [Bagellll]: https://github.com/Bagellll
 [Blueberryy]: https://github.com/Blueberryy
+[bol]: https://github.com/b0ls
 [delstre]: https://github.com/delstre
 [ErickMaksimets]: https://github.com/ErickMaksimets
 [Fafy2801]: https://github.com/Fafy2801
 [Halamix2]: https://github.com/Halamix2
 [Half1569]: https://github.com/Half1569
+[NovaDiablox]: https://github.com/NovaDiablox
 [orecros]: https://github.com/orecros
+[Sigilmare]: https://github.com/Sigilmare
 [Wolfaloo]: https://github.com/Wolfaloo

@@ -55,6 +55,19 @@ return function(lib)
 
 	local function round(num) return math.Round(num * 10) / 10 end
 
+	-- Client side list of edit modes.
+	-- Any edits have to be in sync with the server side list of edit modes.
+	local editModes = {
+		{ Name = "Create Node" },
+		{ Name = "Link Nodes" },
+		{ Name = "Merge/Split/Extend Nodes" },
+		{ Name = "Reposition Node" },
+		{ Name = "Resize Node Area" },
+		{ Name = "Copy Nodes" },
+		{ Name = "Set/Unset Last Parameter" },
+		{ Name = "Delete Item or Area" },
+	}
+
 	function lib.SetIsMapNavMeshViewEnabled(bool)
 		local forceDrawInSkybox = false
 		local forceDrawInSkyboxCounter = 0
@@ -389,26 +402,34 @@ return function(lib)
 				local maxDrawingDistanceSqr = math.pow(math.min(D3bot.Convar_Navmeshing_DrawDistance:GetInt(), 500), 2)
 				if maxDrawingDistanceSqr <= 0 then maxDrawingDistanceSqr = 500*500 end
 				for id, node in pairs(lib.MapNavMesh.NodeById) do
-					if node.HasArea and node.Pos:DistToSqr(eyePos) <= maxDrawingDistanceSqr and (not smartDraw or isNodeIdVisible(id)) then
-						local z = node.Pos.z + 0.2
-						local params = node.Params
-						local color = getOutlineColor(node)
-						local vec1 = Vector(params.AreaXMin, params.AreaYMin, z)
-						local vec2 = Vector(params.AreaXMin, params.AreaYMax, z)
-						local vec3 = Vector(params.AreaXMax, params.AreaYMax, z)
-						local vec4 = Vector(params.AreaXMax, params.AreaYMin, z)
-						render.DrawLine(vec1, vec2, color, true)
-						render.DrawLine(vec2, vec3, color, true)
-						render.DrawLine(vec3, vec4, color, true)
-						render.DrawLine(vec4, vec1, color, true)
-						render.DrawLine(vec1, vec1 + Vector(0, 0, 10), color, true)
-						render.DrawLine(vec2, vec2 + Vector(0, 0, 10), color, true)
-						render.DrawLine(vec3, vec3 + Vector(0, 0, 10), color, true)
-						render.DrawLine(vec4, vec4 + Vector(0, 0, 10), color, true)
-						render.DrawLine(vec1, node.Pos + Vector(0, 0, 0.2), color, true)
-						render.DrawLine(vec2, node.Pos + Vector(0, 0, 0.2), color, true)
-						render.DrawLine(vec3, node.Pos + Vector(0, 0, 0.2), color, true)
-						render.DrawLine(vec4, node.Pos + Vector(0, 0, 0.2), color, true)
+					if node.Pos:DistToSqr(eyePos) <= maxDrawingDistanceSqr and (not smartDraw or isNodeIdVisible(id)) then
+						if node.HasArea then
+							local z = node.Pos.z + 0.2
+							local params = node.Params
+							local color = getOutlineColor(node)
+							local vec1 = Vector(params.AreaXMin, params.AreaYMin, z)
+							local vec2 = Vector(params.AreaXMin, params.AreaYMax, z)
+							local vec3 = Vector(params.AreaXMax, params.AreaYMax, z)
+							local vec4 = Vector(params.AreaXMax, params.AreaYMin, z)
+							render.DrawLine(vec1, vec2, color, true)
+							render.DrawLine(vec2, vec3, color, true)
+							render.DrawLine(vec3, vec4, color, true)
+							render.DrawLine(vec4, vec1, color, true)
+							render.DrawLine(vec1, vec1 + Vector(0, 0, 10), color, true)
+							render.DrawLine(vec2, vec2 + Vector(0, 0, 10), color, true)
+							render.DrawLine(vec3, vec3 + Vector(0, 0, 10), color, true)
+							render.DrawLine(vec4, vec4 + Vector(0, 0, 10), color, true)
+							render.DrawLine(vec1, node.Pos + Vector(0, 0, 0.2), color, true)
+							render.DrawLine(vec2, node.Pos + Vector(0, 0, 0.2), color, true)
+							render.DrawLine(vec3, node.Pos + Vector(0, 0, 0.2), color, true)
+							render.DrawLine(vec4, node.Pos + Vector(0, 0, 0.2), color, true)
+						end
+						if node.Params.MaxHeight then
+							local color = getOutlineColor(node)
+							local vec1 = node.Pos
+							local vec2 = vec1 + Vector(0, 0, node.Params.MaxHeight)
+							render.DrawLine(vec1, vec2, color, true)
+						end
 					end
 				end
 			end)
@@ -438,6 +459,11 @@ return function(lib)
 						end
 					end
 				end
+
+				local editmodeid = lib.MapNavMeshEditMode
+				for i, mod in ipairs(editModes) do
+					draw.SimpleText(string.format("[%s] %s", i, mod.Name), "HudDefault", 100, ScrH()/2+(i*20), editmodeid == i and lib.Color.Red or lib.Color.White)
+				end
 			end)
 		else
 			hook.Remove("Think", hooksId)
@@ -446,3 +472,4 @@ return function(lib)
 		end
 	end
 end
+
