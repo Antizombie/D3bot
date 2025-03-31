@@ -75,7 +75,7 @@ hook.Add( "InitPostEntity", "D3bot.SetupNavLinks", function()
 					if area:HasAttributes( NAV_MESH_WALK ) and neighbor:HasAttributes( NAV_MESH_WALK ) then
 						linkData.Params.Walking = "Needed"
 					end
-					
+
 					if area:HasAttributes( NAV_MESH_CLIFF + NAV_MESH_RUN ) then
 						linkData.Params.Pouncing = "Needed"
 					end

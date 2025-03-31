@@ -36,7 +36,7 @@ return function(lib)
 	---@class D3NavmeshLink : D3NavmeshItem
 	local linkFallback = lib.NavMeshLinkMeta.__index
 
-	lib.BotNodeMinProximitySqr = 40*40
+	lib.BotNodeMinProximitySqr = 1600 --[[40 * 40]]
 
 	lib.MapNavMeshNetworkStr = "D3bot Map NavMesh"
 
@@ -454,7 +454,7 @@ return function(lib)
 		local splitCoord = round(splitPos[posKey])
 
 		-- Check if split position is inside the node area
-		if round(self.Params["Area"..axisName.."Min"] or self.Pos[posKey]) > splitCoord or round(self.Params["Area"..axisName.."Max"] or self.Pos[posKey]) < splitCoord then return end
+		if round(self.Params["Area" .. axisName .. "Min"] or self.Pos[posKey]) > splitCoord or round(self.Params["Area" .. axisName .. "Max"] or self.Pos[posKey]) < splitCoord then return end
 
 		-- Store linked nodes
 		local tempLinkedNodes = {}
@@ -469,23 +469,23 @@ return function(lib)
 		end
 
 		-- Shrink this node
-		self:SetParam(axisName, round(((self.Params["Area"..axisName.."Min"] or self.Pos[posKey]) + splitCoord) / 2))
-		self:SetParam("Area"..axisName.."Max", splitCoord)
+		self:SetParam(axisName, round(((self.Params["Area" .. axisName .. "Min"] or self.Pos[posKey]) + splitCoord) / 2))
+		self:SetParam("Area" .. axisName .. "Max", splitCoord)
 
 		-- Shrink new node
-		newNode:SetParam(axisName, round(((newNode.Params["Area"..axisName.."Max"] or newNode.Pos[posKey]) + splitCoord) / 2))
-		newNode:SetParam("Area"..axisName.."Min", splitCoord)
+		newNode:SetParam(axisName, round(((newNode.Params["Area" .. axisName .. "Max"] or newNode.Pos[posKey]) + splitCoord) / 2))
+		newNode:SetParam("Area" .. axisName .. "Min", splitCoord)
 
 		-- Restore the links TODO: Restore link parameters. Directional links are problematic!
 		for _, linkedNode in pairs(tempLinkedNodes) do
-			if round(linkedNode.Params["Area"..axisName.."Min"] or linkedNode.Pos[posKey]) < splitCoord then
+			if round(linkedNode.Params["Area" .. axisName .. "Min"] or linkedNode.Pos[posKey]) < splitCoord then
 				-- It should already be linked, so ignore
 				-- lib.MapNavMesh:ForceGetLink(self, linkedNode)
 			else
 				local link = self.LinkByLinkedNode[linkedNode]
 				if link then link:Remove() end
 			end
-			if round(linkedNode.Params["Area"..axisName.."Max"] or linkedNode.Pos[posKey]) > splitCoord then
+			if round(linkedNode.Params["Area" .. axisName .. "Max"] or linkedNode.Pos[posKey]) > splitCoord then
 				lib.MapNavMesh:ForceGetLink(newNode, linkedNode)
 			end
 		end
@@ -508,10 +508,10 @@ return function(lib)
 		-- Check on what side to place the new node
 		if not self.HasArea then return end
 		local minCoord, maxCoord
-		if extendCoord > round(self.Params["Area"..axisName.."Max"]) then
-			minCoord, maxCoord = round(self.Params["Area"..axisName.."Max"]), extendCoord
-		elseif extendCoord < round(self.Params["Area"..axisName.."Min"]) then
-			minCoord, maxCoord = extendCoord, round(self.Params["Area"..axisName.."Min"])
+		if extendCoord > round(self.Params["Area" .. axisName .. "Max"]) then
+			minCoord, maxCoord = round(self.Params["Area" .. axisName .. "Max"]), extendCoord
+		elseif extendCoord < round(self.Params["Area" .. axisName .. "Min"]) then
+			minCoord, maxCoord = extendCoord, round(self.Params["Area" .. axisName .. "Min"])
 		else
 			return -- Position is not outside of the area
 		end
@@ -528,8 +528,8 @@ return function(lib)
 
 		-- Resize new node
 		newNode:SetParam(axisName, round((minCoord + maxCoord) / 2))
-		newNode:SetParam("Area"..axisName.."Min", minCoord)
-		newNode:SetParam("Area"..axisName.."Max", maxCoord)
+		newNode:SetParam("Area" .. axisName .. "Min", minCoord)
+		newNode:SetParam("Area" .. axisName .. "Max", maxCoord)
 
 		-- Connect old and new node
 		lib.MapNavMesh:ForceGetLink(self, newNode)
@@ -565,13 +565,13 @@ return function(lib)
 		return from(self.ItemById):SelSort(function(id, item)
 			return nil, id .. lib.NavMeshItemIdParamsPairSeparator .. from(item.Params):SelSort(function(name, numOrStr)
 				return nil, name .. lib.NavMeshItemParamNameNumPairSeparator .. numOrStr
-			end, function(a,b) return tostring(a)<tostring(b) end):Join(lib.NavMeshItemParamsSeparator).R
-		end, function(a,b) return tostring(a)<tostring(b) end):Join(lib.NavMeshItemsSeparator).R
+			end, function(a,b) return tostring(a) < tostring(b) end):Join(lib.NavMeshItemParamsSeparator).R
+		end, function(a,b) return tostring(a) < tostring(b) end):Join(lib.NavMeshItemsSeparator).R
 	end
 	function fallback:ParamsSerializeSorted()
 		return from(self.Params):SelSort(function(name, numOrStr)
 			return nil, name .. lib.NavMeshItemParamNameNumPairSeparator .. numOrStr
-		end, function(a,b) return tostring(a)<tostring(b) end):Join(lib.NavMeshItemsSeparator).R
+		end, function(a,b) return tostring(a) < tostring(b) end):Join(lib.NavMeshItemsSeparator).R
 	end
 
 	function lib.DeserializeNavMesh(serialized)

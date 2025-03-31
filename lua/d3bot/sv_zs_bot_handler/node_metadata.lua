@@ -14,7 +14,7 @@ D3bot.LinkMetadata = D3bot.LinkMetadata or {}
 local nodeMetadata = D3bot.NodeMetadata
 local linkMetadata = D3bot.LinkMetadata
 
-hook.Add("PreRestartRound", D3bot.BotHooksId.."MetadataReset", function()
+hook.Add("PreRestartRound", D3bot.BotHooksId .. "MetadataReset", function()
 	D3bot.NodeMetadata = {}
 	D3bot.LinkMetadata = {}
 	nodeMetadata = D3bot.NodeMetadata
@@ -23,14 +23,14 @@ end)
 
 local nextNodeMetadataReduce = CurTime()
 local nextNodeMetadataIncrease = CurTime()
-hook.Add("Think", D3bot.BotHooksId.."NodeMetadataThink", function()
+hook.Add("Think", D3bot.BotHooksId .. "NodeMetadataThink", function()
 	-- If survivor bots are disabled, ignore capturing team metadata
 	if not D3bot.SurvivorsEnabled then return end
 
 	-- Reduce values over time
 	if nextNodeMetadataReduce < CurTime() then
 		nextNodeMetadataReduce = CurTime() + 5
-		
+
 		for k, v in pairs(nodeMetadata) do
 			if v.ZombieDeathFactor then
 				v.ZombieDeathFactor = v.ZombieDeathFactor * 0.85
@@ -45,7 +45,7 @@ hook.Add("Think", D3bot.BotHooksId.."NodeMetadataThink", function()
 			end
 		end
 	end
-	
+
 	-- Increase counts over time -- TODO: Check if that is a ressource hog
 	local mapNavMesh = D3bot.MapNavMesh
 	if nextNodeMetadataIncrease < CurTime() then
@@ -59,11 +59,11 @@ hook.Add("Think", D3bot.BotHooksId.."NodeMetadataThink", function()
 					if not nodeMetadata[node] then nodeMetadata[node] = {} end
 					local metadata = nodeMetadata[node]
 					if not metadata.PlayerFactorByTeam then metadata.PlayerFactorByTeam = {} end
-					metadata.PlayerFactorByTeam[team] = math.Clamp((metadata.PlayerFactorByTeam[team] or 0) + 1/15 * (player.D3bot_Mem and 0.25 or 1), 0, 1)
+					metadata.PlayerFactorByTeam[team] = math.Clamp((metadata.PlayerFactorByTeam[team] or 0) + 1 / 15 * (player.D3bot_Mem and 0.25 or 1), 0, 1)
 				end
 			end
 		end
-		
+
 		--D3bot.Debug.DrawNodeMetadata(GetPlayerByName("D3"), nodeMetadata)
 	end
 end)

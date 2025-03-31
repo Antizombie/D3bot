@@ -4,9 +4,9 @@ return function(lib)
 
 	local isEnabled = false
 	local hooksId = tostring({})
-	
+
 	local cursoredItemOrNil
-	
+
 	local isPathPieceById = {}
 	function lib.SetShownMapNavMeshPath(ids)
 		isPathPieceById = {}
@@ -20,23 +20,23 @@ return function(lib)
 			previousId = id
 		end
 	end
-	
+
 	local isHighlightedById = {}
 	local selectedNodeIDs = {} -- Contains the same information as `isHighlightedById`, but is sorted by selection order.
 	function lib.HighlightInMapNavMeshView(id) isHighlightedById[id] = true table.insert(selectedNodeIDs, id) end
 	function lib.ClearMapNavMeshViewHighlights() isHighlightedById, selectedNodeIDs = {}, {} end
-	
+
 	local function getItemColor(item) return lib.Color[isHighlightedById[item.Id] and "Green" or (item == cursoredItemOrNil and "Orange" or (isPathPieceById[item.Id] and "Yellow" or "Red"))] end
 	local function getOutlineColor(item) return lib.Color[isHighlightedById[item.Id] and "Green" or (item == cursoredItemOrNil and "Orange" or "Black")] end
-	
+
 	local isHiddenParamByParamName = from((" "):Explode("X Y Z AreaXMin AreaYMin AreaXMax AreaYMax")):VsSet().R
-	
+
 	local nodeVisualProperties = {}
 	local nodeVisualPropertiesQueue = {}
-	
+
 	local function isNodeIdHighlightedOrSelected(id) return isHighlightedById[id] or (cursoredItemOrNil and cursoredItemOrNil.Id == id) end
 	local function isNodeIdVisible(id) return isNodeIdHighlightedOrSelected(id) or nodeVisualProperties[id] and not nodeVisualProperties[id].ShouldHide end
-	
+
 	---Returns the position that the local player is looking at.
 	---@param pl GPlayer
 	---@return GVector|nil
@@ -77,7 +77,7 @@ return function(lib)
 			nodeVisualProperties = {}
 			hook.Add("Think", hooksId, function()
 				cursoredItemOrNil = lib.MapNavMesh:GetCursoredItemOrNil(LocalPlayer())
-				
+
 				local smartDraw = D3bot.Convar_Navmeshing_SmartDraw:GetBool()
 				if smartDraw then
 					-- Add nodes to visual property queue
@@ -109,7 +109,7 @@ return function(lib)
 						end
 					end
 				end
-				
+
 			end)
 			hook.Add("PostDrawOpaqueRenderables", hooksId, function(bDrawingDepth, bDrawingSkybox)
 				if forceDrawInSkyboxCounter > 1 then
@@ -181,7 +181,7 @@ return function(lib)
 						end
 					end
 				end
-				
+
 				if previewDraw then
 					local editmodeid = lib.MapNavMeshEditMode
 					local hitPos = getCursoredPosOrNil(LocalPlayer())

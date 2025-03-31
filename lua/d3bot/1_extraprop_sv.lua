@@ -1,14 +1,14 @@
 
 return function(lib)
 	local from = lib.From
-	
+
 	lib.ExtraPropsDir = "extraprops/"
 	lib.ExtraPropsPath = lib.ExtraPropsDir .. game.GetMap() .. ".txt"
 	lib.ExtraPropsSeparator = ";"
 	lib.ExtraPropSeparator = ","
-	
+
 	lib.ExtraPropByEnt = {}
-	
+
 	file.CreateDir(lib.ExtraPropsDir)
 	function lib.ReloadExtraProps()
 		for ent in pairs(lib.ExtraPropByEnt) do if IsValid(ent) then ent:Remove() end end
@@ -32,15 +32,15 @@ return function(lib)
 		if GAMEMODE.SetupProps then gamemode.Call("SetupProps") end
 	end
 	hook.Add("InitPostEntityMap", tostring({}), function() lib.ReloadExtraProps() end)
-	
+
 	function lib.SaveExtraProps()
 		file.Write(lib.ExtraPropsPath, from(lib.ExtraPropByEnt):Sel(function(k, v)
 			return nil, lib.ExtraPropSeparator:Implode{ v.Pos.x, v.Pos.y, v.Pos.z, v.Ang.p, v.Ang.y, v.Ang.r, v.Model }
 		end):Join(lib.ExtraPropsSeparator).R)
 	end
-	
+
 	function lib.GetIsExtraProp(ent) return lib.ExtraPropByEnt[ent] ~= nil end
-	
+
 	function lib.TrySetExtraProp(ent)
 		if not lib.GetIsExtraProp(ent) and IsValid(ent) and ent:GetClass() == "prop_physics" then
 			lib.ExtraPropByEnt[ent] = {

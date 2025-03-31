@@ -51,7 +51,7 @@ end
 local function test(func)
 	local runtime, displayName = func()
 
-	print(string.format("Benchmarking %q: %.3f ms per call.", displayName, runtime*1000))
+	print(string.format("Benchmarking %q: %.3f ms per call.", displayName, runtime * 1000))
 end
 
 -- Run tests.

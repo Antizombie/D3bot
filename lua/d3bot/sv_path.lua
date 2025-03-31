@@ -118,17 +118,17 @@ end
 
 function D3bot.GetBestValveMeshPathOrNil( startArea, endArea, pathCostFunction, heuristicCostFunction, abilities )
 	if not IsValid( startArea ) or not IsValid( endArea ) then return nil end
-	
+
 	local cameFrom = {}
-	
+
 	startArea:ClearSearchLists()
 	startArea:AddToOpenList()
 	startArea:SetCostSoFar( 0 )
-	
+
 	while not startArea:IsOpenListEmpty() do
 		local current = startArea:PopOpenList()
 		if not current then return end
-		
+
 		if current == endArea then
 			local path = { current }
 			current = current:GetID()
@@ -140,12 +140,12 @@ function D3bot.GetBestValveMeshPathOrNil( startArea, endArea, pathCostFunction, 
 			return path
 		end
 		current:AddToClosedList()
-		
+
 		for _, linkedArea in pairs( current:GetAdjacentAreas() ) do
 			local linkedAreaData = linkedArea:GetMetaData()
 			local link = current:SharesLink( linkedArea )
 			local linkData = link:GetMetaData()
-			
+
 			local blocked = false
 			if linkedAreaData.Params.Condition == "Unblocked" or linkedAreaData.Params.Condition == "Blocked" then
 				local entities = ents.FindInBox( linkedArea:GetCenter() + D3bot.NodeBlocking.mins, linkedArea:GetCenter() + D3bot.NodeBlocking.maxs )
@@ -157,12 +157,12 @@ function D3bot.GetBestValveMeshPathOrNil( startArea, endArea, pathCostFunction, 
 				end
 				if linkedAreaData.Params.Condition == "Blocked" then blocked = not blocked end
 			end
-			
+
 			local able = true
 			if linkData.Params.Walking == "Needed" and abilities and not abilities.Walk then able = false end
 			if linkData.Params.Pouncing == "Needed" and abilities and not abilities.Pounce then able = false end
 			if linkedAreaData.Params.Climbing == "Needed" and abilities and not abilities.Climb then able = false end
-			
+
 			if able and not blocked then
 				local newCostSoFar = current:GetCostSoFar() + math.max( Distance(current:GetCenter(), linkedArea:GetCenter() ) + ( ( linkedAreaData.Params.Cost and current:GetCostSoFar() / 4 ) or 0 ) + ( ( linkData.Params.Cost and current:GetCostSoFar() / 4 ) or 0 ) + ( pathCostFunction and pathCostFunction( current, linkedArea, link ) or 0 ), 0 )
 				if not ( linkedArea:IsOpen() or linkedArea:IsClosed() and linkedArea:GetCostSoFar() <= newCostSoFar ) then
@@ -187,17 +187,17 @@ end
 function D3bot.GetEscapeMeshPathOrNil(startNode, iterations, pathCostFunction, heuristicCostFunction, abilities)
 	local minimalTotalPathCostByNode = {}
 	local minimalPathCostByNode = { [startNode] = 0 }
-	
+
 	local entranceByNode = {}
 	local heuristic = (heuristicCostFunction and heuristicCostFunction(startNode) or 0)
 	local bestNode, bestNodeCost = startNode, heuristic
-	
+
 	local evaluationNodeQueue = D3bot.NewSortedQueue(function(nodeA, nodeB) return (minimalTotalPathCostByNode[nodeA] or math.huge) > (minimalTotalPathCostByNode[nodeB] or math.huge) end)
 	evaluationNodeQueue:Enqueue(startNode)
-	
+
 	while true do
 		local node = evaluationNodeQueue:Dequeue()
-		
+
 		iterations = iterations - 1
 		if iterations == 0 or not node then
 			if not bestNode then return end
@@ -210,9 +210,9 @@ function D3bot.GetEscapeMeshPathOrNil(startNode, iterations, pathCostFunction, h
 			end
 			return path
 		end
-		
+
 		for linkedNode, link in pairs(node.LinkByLinkedNode) do
-			
+
 			local blocked = false
 			if linkedNode.Params.Condition == "Unblocked" or linkedNode.Params.Condition == "Blocked" then
 				local ents = ents.FindInBox(linkedNode.Pos + D3bot.NodeBlocking.mins, linkedNode.Pos + D3bot.NodeBlocking.maxs)
@@ -230,7 +230,7 @@ function D3bot.GetEscapeMeshPathOrNil(startNode, iterations, pathCostFunction, h
 				if GAMEMODE:GetWave() > tonumber(linkedNode.Params.BlockAfterWave) then blocked = true end
 				-- TODO: Invert logic when BlockBeforeWave > BlockAfterWave. This way it's possible to describe a interval of blocked waves, instead of unblocked waves
 			end
-			
+
 			local able = true
 			if link.Params.Walking == "Needed" and abilities and not abilities.Walk then able = false end
 			if link.Params.Pouncing == "Needed" and abilities and not abilities.Pounce then able = false end
@@ -256,7 +256,7 @@ end
 
 function D3bot.GetEscapeValveMeshPathOrNil( startArea, iterations, pathCostFunction, heuristicCostFunction, abilities )
 	if not IsValid( startArea ) then return nil end
-	
+
 	local cameFrom = {}
 
 	startArea:ClearSearchLists()
@@ -268,7 +268,7 @@ function D3bot.GetEscapeValveMeshPathOrNil( startArea, iterations, pathCostFunct
 
 	while not startArea:IsOpenListEmpty() do
 		local current = startArea:PopOpenList()
-		
+
 		iterations = iterations - 1
 		if iterations == 0 or not current then
 			if not bestArea then return end
@@ -305,7 +305,7 @@ function D3bot.GetEscapeValveMeshPathOrNil( startArea, iterations, pathCostFunct
 			if linkData.Params.Walking == "Needed" and abilities and not abilities.Walk then able = false end
 			if linkData.Params.Pouncing == "Needed" and abilities and not abilities.Pounce then able = false end
 			if linkedAreaData.Params.Climbing == "Needed" and abilities and not abilities.Climb then able = false end
-		
+
 			if able and not blocked then
 				local newCostSoFar = current:GetCostSoFar() + math.max( Distance(current:GetCenter(), linkedArea:GetCenter() ) + ( ( linkedAreaData.Params.Cost and current:GetCostSoFar() / 4 ) or 0 ) + ( ( linkData.Params.Cost and current:GetCostSoFar() / 4 ) or 0 ) + ( pathCostFunction and pathCostFunction( current, linkedArea, link ) or 0 ), 0 )
 				if not ( linkedArea:IsOpen() or linkedArea:IsClosed() and linkedArea:GetCostSoFar() <= newCostSoFar ) then

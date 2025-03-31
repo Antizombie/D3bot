@@ -1,5 +1,5 @@
 local roundStartTime = CurTime()
-hook.Add("PreRestartRound", D3bot.BotHooksId.."PreRestartRoundSupervisor", function() roundStartTime, D3bot.NodeZombiesCountAddition = CurTime(), nil end)
+hook.Add("PreRestartRound", D3bot.BotHooksId .. "PreRestartRoundSupervisor", function() roundStartTime, D3bot.NodeZombiesCountAddition = CurTime(), nil end)
 
 function D3bot.GetDesiredBotCount()
 	local wave = math.max(1, GAMEMODE:GetWave())
@@ -67,7 +67,7 @@ function D3bot.MaintainBotRoles()
 	end
 
 	-- TODO: Fix invisible bots when CLASS.OverrideModel is used (most common with Frigid Revenant and other OverrideModel zombies in 2018 ZS if they have a low opacity OverrideModel)
-	
+
 	-- Sort by frags and being boss zombie
 	if botsByTeam[TEAM_UNDEAD] then
 		table.sort(botsByTeam[TEAM_UNDEAD], function(a, b) return (a:GetZombieClassTable().Boss and 1 or 0) > (b:GetZombieClassTable().Boss and 1 or 0) end)
@@ -75,17 +75,17 @@ function D3bot.MaintainBotRoles()
 	for team, botByTeam in pairs(botsByTeam) do
 		table.sort(botByTeam, function(a, b) return a:Frags() < b:Frags() end)
 	end
-	
+
 	-- Stop managing survivor bots, after round started. Except on ZE or obj maps, where survivors are managed to be 0
 	if GAMEMODE:GetWave() > 0 and not GAMEMODE.ZombieEscape and not GAMEMODE.ObjectiveMap then
 		desiredCountByTeam[TEAM_SURVIVOR] = nil
 	end
-	
+
 	-- Manage survivor bot count to 0, if they are disabled
 	if not D3bot.SurvivorsEnabled then
 		desiredCountByTeam[TEAM_SURVIVOR] = 0
 	end
-	
+
 	-- Move (kill) survivors to undead if possible
 	if desiredCountByTeam[TEAM_SURVIVOR] and desiredCountByTeam[TEAM_UNDEAD] then
 		if #(playersByTeam[TEAM_SURVIVOR] or {}) > desiredCountByTeam[TEAM_SURVIVOR] and #(playersByTeam[TEAM_UNDEAD] or {}) < desiredCountByTeam[TEAM_UNDEAD] and botsByTeam[TEAM_SURVIVOR] then

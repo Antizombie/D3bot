@@ -12,7 +12,7 @@ return function(lib)
 		if not item or item.Type ~= "node" then return end
 		return item
 	end
-	
+
 	local selectedNodesOrNilByPl = {}
 	local function hasSelection(pl) return selectedNodesOrNilByPl[pl] end
 	local function getSelectedNodes(pl) return selectedNodesOrNilByPl[pl] or {} end
@@ -27,22 +27,22 @@ return function(lib)
 		if not cursoredNodeOrNil then return end
 		pl:SendLua(lib.GlobalK .. ".HighlightInMapNavMeshView(" .. cursoredNodeOrNil.Id .. ")")
 	end
-	
+
 	local function round(num) return math.Round(num * 10) / 10 end
-	
+
 	local function setPos(node, pos)
 		node:SetParam("X", round(pos.x))
 		node:SetParam("Y", round(pos.y))
 		node:SetParam("Z", round(pos.z))
 	end
-	
+
 	local function getCursoredDirection(ang) return math.Round(math.abs(math.abs(ang) - 90) / 90) end
 	local function getCursoredAxisName(pl, excludeZOrNil)
 		local angs = pl:EyeAngles()
 		if not excludeZOrNil and getCursoredDirection(angs.p) == 0 then return "Z" end
 		return getCursoredDirection(angs.y) == 1 and "X" or "Y"
 	end
-	
+
 	local editModes = {
 		{	Name = "Create Node",
 			FuncByKey = {
@@ -202,12 +202,12 @@ return function(lib)
 					lib.MapNavMesh:InvalidateCache()
 					lib.UpdateMapNavMeshUiSubscribers()
 				end } } }
-	
+
 	local editModeByPl = {}
-	
+
 	local subscribers = {}
 	local subscriptionTypeOrNilByPl = {}
-	
+
 	function lib.BeMapNavMeshUiSubscriber(pl) if not subscriptionTypeOrNilByPl[pl] then lib.SetMapNavMeshUiSubscription(pl, "view") end end
 	function lib.SetMapNavMeshUiSubscription(pl, subscriptionTypeOrNil, isSpectator)
 		local formerSubscriptionTypeOrNil = subscriptionTypeOrNilByPl[pl]
@@ -266,7 +266,7 @@ return function(lib)
 	end
 
 	function lib.UpdateMapNavMeshUiSubscribers() lib.UploadMapNavMesh(subscribers) end
-	
+
 	local pathDebugTimerIdPrefix = tostring({}) .. "-"
 	local function getPathDebugTimerId(pl) return pathDebugTimerIdPrefix .. pl:EntIndex() end
 	function lib.ShowMapNavMeshPath(pl, pathOrEntA, nilOrEntB)

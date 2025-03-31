@@ -22,7 +22,7 @@ function meta:D3bot_GetAttackPosOrNilFuture(fraction, t)
 	local mem = self.D3bot_Mem
 	local tgt = mem.TgtOrNil
 	if not tgt or not IsValid(tgt) then return end
-	return tgt:IsPlayer() and LerpVector(fraction or 0.75, tgt:GetPos(), tgt:EyePos()) + tgt:GetVelocity()*t or tgt:WorldSpaceCenter()
+	return tgt:IsPlayer() and LerpVector(fraction or 0.75, tgt:GetPos(), tgt:EyePos()) + tgt:GetVelocity() * t or tgt:WorldSpaceCenter()
 end
 
 ---Linear extrapolated attack position for the player entity in the future.
@@ -36,7 +36,7 @@ function meta:D3bot_GetAttackPosOrNilFuturePlatforms(fraction, t)
 	if not tgt or not IsValid(tgt) then return end
 	local phys = tgt:GetPhysicsObject()
 	if not tgt or not IsValid(phys) then return end
-	return tgt:IsPlayer() and LerpVector(fraction or 0.75, tgt:GetPos(), tgt:EyePos()) + phys:GetVelocity()*t or tgt:WorldSpaceCenter()
+	return tgt:IsPlayer() and LerpVector(fraction or 0.75, tgt:GetPos(), tgt:EyePos()) + phys:GetVelocity() * t or tgt:WorldSpaceCenter()
 end
 
 function meta:D3bot_IsLookingAt(targetPos, conditionCos)
@@ -56,7 +56,7 @@ function meta:D3bot_CanPounceToPos(pos)
 		return
 	end
 	
-	local selfPos = self:GetPos()--LerpVector(0.75, self:GetPos(), self:EyePos())
+	local selfPos = self:GetPos() --LerpVector(0.75, self:GetPos(), self:EyePos())
 	local trajectories = D3bot.GetTrajectories(initVel, selfPos, pos, 8)
 	local resultTrajectories = {}
 	for _, trajectory in ipairs(trajectories) do
@@ -65,7 +65,7 @@ function meta:D3bot_CanPounceToPos(pos)
 		for _, point in ipairs(trajectory.points) do
 			if lastPoint then
 				local tr = util.TraceEntity({start = point, endpos = lastPoint, mask = CONTENTS_SOLID + CONTENTS_GRATE + CONTENTS_MOVEABLE + CONTENTS_PLAYERCLIP}, self)
-				if tr.Hit and pos:DistToSqr(tr.HitPos) > 16*16 then
+				if tr.Hit and pos:DistToSqr(tr.HitPos) > 256 --[[16 * 16]] then
 					-- We consider this path invalid, since the bot would hit something and end up further away from the target than about a normal hull box half width.
 					hit = true
 					break
@@ -409,8 +409,8 @@ function meta:D3bot_CheckStuck()
 	
 	local pos_1, pos_2, pos_10 = posList[1], posList[2], posList[10]
 	
-	local minorStuck = pos_1 and pos_2 and pos_1:DistToSqr(pos_2) < 1*1				-- Stuck on ladder
-	local preMajorStuck = pos_1 and pos_10 and pos_1:DistToSqr(pos_10) < 300*300	-- Running circles, some obstacles in the way, ...
+	local minorStuck = pos_1 and pos_2 and pos_1:DistToSqr(pos_2) < 1 --[[1 * 1]]				-- Stuck on ladder
+	local preMajorStuck = pos_1 and pos_10 and pos_1:DistToSqr(pos_10) < 90000 --[[300 * 300]]	-- Running circles, some obstacles in the way, ...
 	local majorStuck = false
 
 	if preMajorStuck and (not self.D3bot_LastDamage or self.D3bot_LastDamage < CurTime() - 5) then

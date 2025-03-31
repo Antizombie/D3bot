@@ -1,10 +1,10 @@
 
 return function(globalK, otherLibFilesRelPathEach)
 	local lib = {}
-	
+
 	local consoleErrorColor = Color(255, 75, 0)
 	function lib.LogError(msg) MsgC(consoleErrorColor, "Error: " .. msg .. "\n") end
-	
+
 	function lib.TryInvoke(func, ...) if isfunction(func) then func(...) end end
 	function lib.TryCatch(func, error)
 		local didNotError, errorMsg = xpcall(func, debug.traceback)
@@ -14,9 +14,9 @@ return function(globalK, otherLibFilesRelPathEach)
 		func(a, b)
 		func(b, a)
 	end
-	
+
 	function lib.WriteOrAdd(tbl, k, v) if k == nil then table.insert(tbl, v) else tbl[k] = v end end
-	
+
 	lib.SortedQueueMeta = { __index = {} }
 	local sortedQueueFallback = lib.SortedQueueMeta.__index
 	function lib.NewSortedQueue(func)
@@ -35,27 +35,27 @@ return function(globalK, otherLibFilesRelPathEach)
 		if item then self.Set[item] = nil end
 		return item
 	end
-	
+
 	function lib.GetSplitStr(str, separator) return str == "" and {} or str:Split(separator) end
 	function lib.GetWrappedStr(str, wrap) return wrap .. str .. wrap end
 	function lib.GetQuotedStr(str) return lib.GetWrappedStr(str, "\"") end
-	
+
 	function lib.Send(...) (SERVER and net.Send or net.SendToServer)(...) end
-	
+
 	function lib.PairsByKeys(t, f)
-      local a = {}
-      for n in pairs(t) do table.insert(a, n) end
-      table.sort(a, f)
-      local i = 0				-- iterator variable
-      local iter = function ()	-- iterator function
-        i = i + 1
-        if a[i] == nil then return nil
-        else return a[i], t[a[i]]
-        end
-      end
-      return iter
-    end
-	
+		local a = {}
+		for n in pairs(t) do table.insert(a, n) end
+		table.sort(a, f)
+		local i = 0				-- iterator variable
+		local iter = function ()	-- iterator function
+			i = i + 1
+		if a[i] == nil then return nil
+		else return a[i], t[a[i]]
+		end
+	end
+		return iter
+	end
+
 	lib.QueryMeta = { __index = {} }
 	local queryFallback = lib.QueryMeta.__index
 	function lib.From(v) return setmetatable({ R = v }, lib.QueryMeta) end
@@ -148,7 +148,7 @@ return function(globalK, otherLibFilesRelPathEach)
 		self.R = string.Implode(separator, self.R)
 		return self
 	end
-	
+
 	function lib.GetFileInfo(path)
 		local pathWoExt = path:StripExtension()
 		local includePath = lib.GetIncludePath(path)
@@ -177,7 +177,7 @@ return function(globalK, otherLibFilesRelPathEach)
 	end
 	function lib.MakeLibFileAvailable(relInfo) if SERVER and relInfo.IsClside then AddCSLuaFile(relInfo.IncludePath) end end
 	function lib.ExecuteLibFile(relInfo) if (SERVER and relInfo.IsSvside) or (CLIENT and relInfo.IsClside) then lib.TryInvoke(include(relInfo.IncludePath), lib) end end
-	
+
 	lib.Color = {}
 	lib.Color.Black = Color(0, 0, 0)
 	lib.Color.White = Color(255, 255, 255)
@@ -190,14 +190,14 @@ return function(globalK, otherLibFilesRelPathEach)
 		color.EightAlpha = ColorAlpha(color, 32)
 		color.SixteenthAlpha = ColorAlpha(color, 32)
 	end
-	
+
 	function lib.GetEntsOfClss(clss) return from(clss):SelV(ents.FindByClass):Concat().R end
-	
+
 	if SERVER then
 		local relFileInfo = lib.GetFileInfo(debug.getinfo(1, "S").short_src)
-		
+
 		lib.MakeLibFileAvailable(relFileInfo)
-		
+
 		local assumedLibFilesRelPathEach = from(file.Find(relFileInfo.Dir .. "*.lua", "GAME")):SelV(function(name) return relFileInfo.IncludeDir .. name end).R
 		function lib.SuggestSecondLibArgument() return "{\n\t" .. from(assumedLibFilesRelPathEach):Wo(relFileInfo.IncludePath):Sort():SelV(lib.GetQuotedStr):Join(",\n\t").R .. " }" end
 	end
@@ -206,7 +206,7 @@ return function(globalK, otherLibFilesRelPathEach)
 		lib.MakeLibFileAvailable(relInfo)
 		lib.ExecuteLibFile(relInfo)
 	end
-	
+
 	if _G[globalK] then error("The specified global variable has already been assigned to.", 2) end
 	_G[globalK] = lib
 	lib.GlobalK = globalK

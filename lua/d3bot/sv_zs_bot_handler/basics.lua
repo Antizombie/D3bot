@@ -4,12 +4,12 @@ D3bot.Basics = {}
 ---@param bot GPlayer
 function D3bot.Basics.SuicideOrRetarget(bot)
 	local mem = bot.D3bot_Mem
-	
+
 	local nodeOrNil = mem.NodeOrNil
 	local nextNodeOrNil = mem.NextNodeOrNil
-	
+
 	if D3bot.UsingSourceNav then return end
-		
+
 	if nodeOrNil and nextNodeOrNil and nextNodeOrNil.Pos.z > nodeOrNil.Pos.z + 55 then
 		local wallParam = nextNodeOrNil.Params.Wall
 		if wallParam == "Retarget" then
@@ -85,7 +85,7 @@ function D3bot.Basics.Walk(bot, pos, aimAngle, slowdown, proximity)
 			bot:D3bot_AngsRotateTo(Vector(pos.x-origin.x, pos.y-origin.y, 0):Angle(), 0.5)
 		end
 	else
-		if mem.BarricadeAttackEntity and mem.BarricadeAttackPos and mem.BarricadeAttackEntity:IsValid() and mem.BarricadeAttackPos:DistToSqr(origin) < 100*100 then
+		if mem.BarricadeAttackEntity and mem.BarricadeAttackPos and mem.BarricadeAttackEntity:IsValid() and mem.BarricadeAttackPos:DistToSqr(origin) < 10000 --[[100 * 100]] then
 			-- We have a barricade entity to attack, so we aim for this one.
 			offshootAngle = bot:D3bot_GetOffshoot(0.1)
 			aimAngle = aimAngle or (mem.BarricadeAttackPos - bot:GetShootPos()):Angle()
@@ -177,7 +177,7 @@ function D3bot.Basics.Walk(bot, pos, aimAngle, slowdown, proximity)
 		---@type GVector
 		local closestDiff = origin - nextNodeOrNil:GetClosestPointOnArea(origin)
 		local closestDistSqr = closestDiff:Length2DSqr()
-		if closestDistSqr <= halfHullWidth*halfHullWidth then
+		if closestDistSqr <= halfHullWidth * halfHullWidth then
 			actions.Duck = true
 		end
 	end
@@ -214,7 +214,7 @@ function D3bot.Basics.Walk(bot, pos, aimAngle, slowdown, proximity)
 				---@type GVector
 				local closestDiff = origin - nextNodeOrNil:GetClosestPointOnArea(origin)
 				local closestDistSqr = closestDiff:Length2DSqr()
-				if closestDistSqr <= halfHullWidth*halfHullWidth then
+				if closestDistSqr <= halfHullWidth * halfHullWidth then
 					actions.Jump = true
 				end
 			end
@@ -244,7 +244,7 @@ function D3bot.Basics.Walk(bot, pos, aimAngle, slowdown, proximity)
 				if (math.abs(movementVector.x) < 20 or bot:GetVelocity():Length() < 10) and math.abs(movementVector.y) > 1 then movementVector.x = 0 end
 			end
 		end
-		
+
 	elseif minorStuck then
 		-- Stuck on ladder
 		actions.Jump = true
@@ -453,7 +453,7 @@ function D3bot.Basics.WalkAttackAuto(bot)
 		---@type GVector
 		local closestDiff = origin - nextNodeOrNil:GetClosestPointOnArea(origin)
 		local closestDistSqr = closestDiff:Length2DSqr()
-		if closestDistSqr <= halfHullWidth*halfHullWidth then
+		if closestDistSqr <= halfHullWidth * halfHullWidth then
 			actions.Duck = true
 		end
 	end
@@ -488,7 +488,7 @@ function D3bot.Basics.WalkAttackAuto(bot)
 				---@type GVector
 				local closestDiff = origin - nextNodeOrNil:GetClosestPointOnArea(origin)
 				local closestDistSqr = closestDiff:Length2DSqr()
-				if closestDistSqr <= halfHullWidth*halfHullWidth then
+				if closestDistSqr <= halfHullWidth * halfHullWidth then
 					actions.Jump = true
 				end
 			end
@@ -649,7 +649,7 @@ function D3bot.Basics.PounceAuto(bot, crab)
 	end
 
 	return false, {}, nil, nil, nil, angle_zero, false, false, false
-end 
+end
 
 ---Basic aim and shoot handler for survivor bots.
 ---(Or anything that can hold a gun)
@@ -737,7 +737,7 @@ function D3bot.Basics.LookAround(bot)
 
 	local origin = bot:EyePos()
 
-	bot:D3bot_AngsRotateTo((mem.LookTarget:EyePos()- origin):Angle(), D3bot.BotAngLerpFactor * 0.3)
+	bot:D3bot_AngsRotateTo((mem.LookTarget:EyePos() - origin):Angle(), D3bot.BotAngLerpFactor * 0.3)
 
 	return true, {}, 0, nil, nil, mem.Angs, false, false, false
 end

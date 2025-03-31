@@ -1,7 +1,7 @@
 
 return function(lib)
 	lib.MapNavMeshDir = "d3bot/navmesh/map/"
-	
+
 	function lib.GetMapNavMeshPath(mapName)
 		return lib.MapNavMeshDir .. mapName .. ".txt"
 	end
@@ -10,11 +10,11 @@ return function(lib)
 	end
 	lib.MapNavMeshPath = lib.GetMapNavMeshPath(game.GetMap())
 	lib.MapNavMeshParamsPath = lib.GetMapNavMeshParamsPath(game.GetMap())
-	
+
 	function lib.CheckMapNavMesh(mapName)
 		return file.Exists(lib.GetMapNavMeshPath(mapName), "DATA")
 	end
-	
+
 	util.AddNetworkString(lib.MapNavMeshNetworkStr)
 	function lib.UploadMapNavMesh(plOrPls)
 		local rawData = util.Compress(lib.MapNavMesh:Serialize()) or ""
@@ -39,7 +39,7 @@ return function(lib)
 		net.WriteUInt(0, 16)
 		net.Send(plOrPls)
 	end
-	
+
 	file.CreateDir(lib.MapNavMeshDir)
 	function lib.SaveMapNavMesh()
 		file.Write(lib.MapNavMeshPath, lib.MapNavMesh:SerializeSorted())

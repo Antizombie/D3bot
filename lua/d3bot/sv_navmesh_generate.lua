@@ -40,7 +40,7 @@ function D3bot.ConvertNavmesh(callback)
 			local areaNorthEastCorner = area:GetCorner(1)
 			local areaSouthEastCorner = area:GetCorner(2)
 			local areaSouthWestCorner = area:GetCorner(3)
-			
+
 			local areaHighest = areaCenter.z
 			local areaLowest = areaHighest
 			if not ((areaNorthWestCorner.z == areaSouthEastCorner.z) and (areaNorthEastCorner.z == areaSouthWestCorner.z)) then
@@ -66,7 +66,7 @@ function D3bot.ConvertNavmesh(callback)
 					areaLowest = areaSouthWestCorner.z
 				end
 			end
-			
+
 			for k, neighbor in ipairs(area:GetAdjacentAreas()) do
 				local neighborCenter = neighbor:GetCenter()
 
@@ -74,7 +74,7 @@ function D3bot.ConvertNavmesh(callback)
 				local neighborNorthEastCorner = neighbor:GetCorner(1)
 				local neighborSouthEastCorner = neighbor:GetCorner(2)
 				local neighborSouthWestCorner = neighbor:GetCorner(3)
-				
+
 				local neighborHighest = neighborCenter.z
 				local neighborLowest = neighborHighest
 				if not ((neighborNorthWestCorner.z == neighborSouthEastCorner.z) and (neighborNorthEastCorner.z == neighborSouthWestCorner.z)) then
@@ -88,7 +88,7 @@ function D3bot.ConvertNavmesh(callback)
 					if neighborHighest < neighborSouthWestCorner.z then
 						neighborHighest = neighborSouthWestCorner.z
 					end
-	
+
 					neighborLowest = neighborNorthWestCorner.z
 					if neighborLowest > neighborSouthEastCorner.z then
 						neighborLowest = neighborSouthEastCorner.z
@@ -100,19 +100,19 @@ function D3bot.ConvertNavmesh(callback)
 						neighborLowest = neighborSouthWestCorner.z
 					end
 				end
-				
+
 				if math_abs(areaCenter.z - neighborCenter.z) <= 58 or math_abs(areaHighest - neighborLowest) <= 58 or math_abs(areaLowest - neighborHighest) <= 58 then
 					local selectedNode = mapNavMesh:GetNearestNodeOrNil(areaCenter)
-					
+
 					if selectedNode then
 						local node = mapNavMesh:GetNearestNodeOrNil(neighborCenter)
-						
+
 						if node then
 							mapNavMesh:ForceGetLink(selectedNode, node)
 						end
 					end
 				end
-				
+
 				if (k % 4) == 0 then
 					coroutine.yield()
 				end
