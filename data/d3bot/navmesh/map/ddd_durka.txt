@@ -1,0 +1,1 @@
+2:AreaXMax=256,AreaXMin=-256,AreaYMax=256,AreaYMin=-256,X=-1.6,Y=-1.3,Z=0
