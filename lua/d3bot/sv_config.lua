@@ -6,7 +6,8 @@ D3bot.BotSeeTr = {
 D3bot.NodeBlocking = {
 	mins = Vector(-1, -1, -1),
 	maxs = Vector(1, 1, 1),
-	classes = {func_breakable = true, prop_physics = true, prop_dynamic = true, prop_door_rotating = true, func_door = true, func_physbox = true, func_physbox_multiplayer = true, func_movelinear = true}
+	classes = {func_breakable = true, prop_physics = true, prop_dynamic = true, prop_door_rotating = true,
+	func_door = true, func_physbox = true, func_physbox_multiplayer = true, func_movelinear = true, func_wall_toggle = true, func_tracktrain = true}
 }
 
 D3bot.NodeBlockingMap = {
@@ -49,7 +50,7 @@ D3bot.StartBonus = nil					-- Number of additional points, that players get at t
 D3bot.DisableBotCrows = false			-- Disable crows from being controlled by the bot.
 
 -- Uncomment the name file you want to use. If you comment out all of the name files, standard names will be used. (Bot, Bot(2), Bot(3), ...)
-D3bot.BotNameFile = "fng_usernames"
+D3bot.BotNameFile = "fun_usernames"
 --D3bot.BotNameFile = "bottish"
 
 D3bot.UseConsoleBots = false			-- If true, bots will be spawned "the old way". But this will disable custom names.
