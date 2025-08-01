@@ -266,11 +266,8 @@
 289-274:
 290:AreaXMax=-144,AreaXMin=-202.7,AreaYMax=-621.8,AreaYMin=-731.8,JumpTo=Always,See=Disabled,X=-173.3,Y=-676.8,Z=100.3
 290-109:
-290-288:
 290-291:
 291:AreaXMax=-36.8,AreaXMin=-144,AreaYMax=-621.8,AreaYMin=-731.8,See=Disabled,X=-90.4,Y=-676.8,Z=115.3
-291-289:
-291-294:
 292:AreaXMax=104.3,AreaXMin=13.2,AreaYMax=-759.2,AreaYMin=-794.6,See=Disabled,X=58.8,Y=-776.9,Z=264
 292-188:
 292-195:
